@@ -51,57 +51,57 @@ export default function ImageUploader() {
     }
   }
 
+  async function downloadImage(): Promise<void> {}
+
   return (
     <div>
       <div className="content h-screen w-screen flex flex-row">
         <div className="leftSide w-1/2 m-6">
           <div className="title mb-14">
-            <p className="text-5xl font-bold">
-            Image Pixelator
-            </p>
+            <p className="text-5xl font-bold">Image Pixelator</p>
           </div>
-          <div className="inputContainer grid grid-rows-2">
-            <section className="chooseFileContainer">
+          <div className="inputContainer grid grid-rows-2 bg-gray-300 rounded-xl mb-5">
+            <section className="chooseFileContainer rounded-lg">
               <input
+                id="fileInput"
                 type="file"
                 onChange={handleImageChange}
                 accept="image/png, image/jpg, image/jpeg"
               />
             </section>
-            <section className="percentContainer grid grid-rows-2 w-min">
-              <label htmlFor="number"> What Percentage? </label>
-              <input type="number" onChange={handlePixelationPercent} />
+            <section className="percentContainer">
+              <label htmlFor="number" className="pr-3">
+                {" "}
+                What Percentage?{" "}
+              </label>
+              <input
+                id="numberInput"
+                type="number"
+                placeholder="1 - 100"
+                onChange={handlePixelationPercent}
+              />
             </section>
           </div>
-          {image && status !== "uploading" && (
-            <button
-              className="bg-blue-400 rounded-lg text-white"
-              onClick={handleImageUpload}
-            >
-              Pixelate
-            </button>
-          )}
+          <button className="float-right" onClick={handleImageUpload}>
+            Pixelate
+          </button>
         </div>
         <div className="rightSide w-1/2 bg-gray-200 relative">
           {pixelated && (
-            <div className="justify-center">
+            <div className="newImageRender flex flex-col align-center">
               <Image
                 height={imageHeight}
                 width={imageWidth}
                 src="/images/newImage.jpg"
                 alt="newImage"
               />
-              <section className="absolute left-[40%] mt-4 items-center">
-                <p className="text-2xl font-bold">Pixelation done!</p>
+              <section>
+                <p className="text-center text-2xl font-bold m-6">Pixelation done!</p>
               </section>
-              <section className="absolute mt-16 left-[27%]">
-                <button className="w-40 mr-8 bg-blue-400 rounded-lg text-white">
-                  Try Again
-                </button>
-                <button className="w-40 bg-blue-400 rounded-lg text-white">
-                  Download
-                </button>
-                </section>
+              <section className="ml-36 flex flex-row">
+                <button>Try Again</button>
+                <button onClick={downloadImage}>Download</button>
+              </section>
             </div>
           )}
           {status === "error" && <p>Image upload failed...</p>}

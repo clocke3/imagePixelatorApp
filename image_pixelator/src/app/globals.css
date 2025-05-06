@@ -1,9 +1,36 @@
 @import "tailwindcss";
 
+button {
+  @apply w-52 h-12 text-xl font-bold bg-blue-400 rounded-md text-white;
+}
+
+.inputContainer > section {
+  @apply p-5;
+}
+
+.percentContainer {
+  @apply ml-4;
+}
+
+input[type="file"] {
+  @apply ml-3 mt-2;
+}
 input[type="file"]::file-selector-button {
-  @apply bg-blue-400 rounded-md w-28;
+  @apply bg-blue-400 rounded-md w-28 h-8;
+}
+
+input[type="file"]::selection{
+  @apply ml-12;
 }
 
 input[type="number"] {
-  @apply border-1;
+  @apply border-1 bg-white rounded-md;
+}
+ 
+input[type="number"]::placeholder {
+  @apply pl-2;
+}
+
+.newImageRender > section > button {
+  @apply mr-5;
 }
