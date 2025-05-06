@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+input[type="file"]::file-selector-button {
+  @apply bg-blue-400 rounded-md;
+}
+
+input[type="number"] {
+  @apply border-2;
+}
