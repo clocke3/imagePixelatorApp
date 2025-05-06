@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@next/font": "^14.2.15",
     "fs": "^0.0.1-security",
     "image-conversion": "^2.1.1",
     "jimp": "^1.6.0",

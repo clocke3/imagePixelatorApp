@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ChangeEvent, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
+import { inclusive_sans } from '../utils/fonts'
 
 type UploadStatus = "idle" | "uploading" | "success" | "error";
 
@@ -51,10 +51,8 @@ export default function ImageUploader() {
     }
   }
 
-  async function downloadImage(): Promise<void> {}
-
   return (
-    <div>
+    <div className={`${inclusive_sans}`}>
       <div className="content h-screen w-screen flex flex-row">
         <div className="leftSide w-1/2 m-6">
           <div className="title mb-14">
@@ -82,7 +80,7 @@ export default function ImageUploader() {
               />
             </section>
           </div>
-          <button className="float-right" onClick={handleImageUpload}>
+          <button className="pixelateButton" onClick={handleImageUpload}>
             Pixelate
           </button>
         </div>
@@ -100,7 +98,9 @@ export default function ImageUploader() {
               </section>
               <section className="ml-36 flex flex-row">
                 <button>Try Again</button>
-                <button onClick={downloadImage}>Download</button>
+                <a href="/images/newImage.jpg" download="pixelatedImage">
+                  <button>Download</button>
+                </a>
               </section>
             </div>
           )}

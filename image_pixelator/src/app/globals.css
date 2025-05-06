@@ -5,11 +5,15 @@ button {
 }
 
 .inputContainer > section {
-  @apply p-5;
+  @apply p-3;
 }
 
 .percentContainer {
   @apply ml-4;
+}
+
+.pixelateButton {
+  @apply float-right hover:bg-pink-500;
 }
 
 input[type="file"] {
@@ -24,7 +28,7 @@ input[type="file"]::selection{
 }
 
 input[type="number"] {
-  @apply border-1 bg-white rounded-md;
+  @apply border-1 bg-white rounded-sm;
 }
  
 input[type="number"]::placeholder {
@@ -32,5 +36,10 @@ input[type="number"]::placeholder {
 }
 
 .newImageRender > section > button {
-  @apply mr-5;
+  @apply mr-5 hover:bg-green-700;
 }
+
+.newImageRender > section > a > button {
+  @apply mr-5 hover:bg-green-700;
+}
+
