@@ -4,85 +4,57 @@ import Image from "next/image";
 import { inclusive_sans } from "../utils/fonts";
 
 type UploadStatus = "idle" | "uploading" | "success" | "error";
-interface ErrorMessage {
-  id: number;
-  message: string;
-}
 
 export default function ImageUploader() {
   const [image, setImage] = useState<File | null>(null);
   const [pixelPercentage, setPixelPercentage] = useState<string>("");
   const [status, setStatus] = useState<UploadStatus>("idle");
-  const [errors, setErrors] = useState<ErrorMessage[]>([]);
+  const [percentageError, setPercentageError] = useState<string>("");
   const [pixelated, setPixelated] = useState<boolean>(false);
   const [imageHeight, setImageHeight] = useState<number>(0);
   const [imageWidth, setImageWidth] = useState<number>(0);
 
-  function handleImageChange(e: ChangeEvent<HTMLInputElement>) {
+  async function handleImageChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) setImage(file);
   }
 
-  function handlePixelationPercent(e: ChangeEvent<HTMLInputElement>) {
+  async function handlePixelationPercent(e: ChangeEvent<HTMLInputElement>) {
     const percentage = e.target.value;
-    if (
-      percentage &&
-      (parseInt(percentage) <= 0 || parseInt(percentage) > 100)){
-        const percentageError = {
-          id: 3, message: "Percentage must be a number between 1 and 100"};
-        setErrors([
-          ...errors, percentageError
-        ]);
+    if (percentage && (parseInt(percentage) <= 0 || parseInt(percentage) > 100)){
+       const message = "Percentage must be a number from 1 to 100";
+       setPercentageError(message);
       } else {
-        if (errors.some((error) => error.id === 3)) {
-          errors.splice(errors.findIndex((errors) => errors.id == 3), 1);
-        }
+        if (percentageError) setPercentageError("");
         setPixelPercentage(percentage);
       }
+      console.log('Pixel percentage: ' + pixelPercentage);
   }
 
   async function handleImageUpload(): Promise<void> {
-    if (image === null || !pixelPercentage) {
-      if (image === null) {
-        console.log('1th if')
-        const imageError: ErrorMessage = {
-          id: 1, message: "A jpg file must be uploaded" 
+    if (image instanceof File && pixelPercentage) {
+      setStatus("uploading");
+
+      const formData = new FormData();
+      formData.append("file", image);
+      formData.append("pixelSize", pixelPercentage);
+  
+      try {
+        const resp = await axios.post("/api/pixelate", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        if (!resp) {
+          setStatus("error");
+          throw new Error("Failed to fetch");
         }
-        errors.push(imageError);
-      }
-      if (!pixelPercentage) {
-        console.log('2th if')
-        setErrors([...errors, { id: 2, message: "A number must be typed" }]);
-      }
-
-      console.log(pixelPercentage);
-      setStatus("error");
-      console.log(status);
-
-      return;
-    }
-
-    setStatus("uploading");
-
-    const formData = new FormData();
-    formData.append("file", image);
-    formData.append("pixelSize", pixelPercentage);
-
-    try {
-      const resp = await axios.post("/api/pixelate", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      if (!resp) {
+        setImageHeight(resp.data.height);
+        setImageWidth(resp.data.width);
+        setPixelated(true);
+      } catch {
         setStatus("error");
-        throw new Error("Failed to fetch");
       }
-      setImageHeight(resp.data.height);
-      setImageWidth(resp.data.width);
-      setPixelated(true);
-    } catch {
-      setStatus("error");
     }
     console.log(status);
   }
@@ -102,11 +74,6 @@ export default function ImageUploader() {
                 onChange={handleImageChange}
                 accept="image/png, image/jpg, image/jpeg"
               />
-              {image === null && errors.some((error) => error.id === 1) && (
-                <p>
-                  {errors.find((error) => error.id == 1)?.message}
-                </p>
-              )}
             </section>
             <section>
               <label htmlFor="number" className="pr-3">
@@ -119,19 +86,14 @@ export default function ImageUploader() {
                 placeholder="1 - 100"
                 onChange={handlePixelationPercent}
               />
-              {!pixelPercentage && errors.some((error) => error.id === 2) && (
+              {pixelPercentage && percentageError && (
                 <p className="text-red-500">
-                  {errors.find((error) => error.id == 2)?.message}
-                </p>
-              )}
-              {pixelPercentage && errors.some((error) => error.id === 3) && (
-                <p className="text-red-500">
-                  {errors.find((error) => error.id == 3)?.message}
+                  {percentageError}
                 </p>
               )}
             </section>
           </div>
-          {image instanceof File && pixelPercentage && !errors.some((errors) => errors.id == 3) &&
+          {image instanceof File && pixelPercentage && percentageError == "" &&
           (
             <button className="pixelateButton" onClick={handleImageUpload}>
             Pixelate
