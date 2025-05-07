@@ -1,14 +1,19 @@
 import { ChangeEvent, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
-import { inclusive_sans } from '../utils/fonts'
+import { inclusive_sans } from "../utils/fonts";
 
 type UploadStatus = "idle" | "uploading" | "success" | "error";
+interface ErrorMessage {
+  id: number;
+  message: string;
+}
 
 export default function ImageUploader() {
   const [image, setImage] = useState<File | null>(null);
   const [pixelPercentage, setPixelPercentage] = useState<string>("");
   const [status, setStatus] = useState<UploadStatus>("idle");
+  const [errors, setErrors] = useState<ErrorMessage[]>([]);
   const [pixelated, setPixelated] = useState<boolean>(false);
   const [imageHeight, setImageHeight] = useState<number>(0);
   const [imageWidth, setImageWidth] = useState<number>(0);
@@ -20,12 +25,42 @@ export default function ImageUploader() {
 
   function handlePixelationPercent(e: ChangeEvent<HTMLInputElement>) {
     const percentage = e.target.value;
-    if (percentage && (parseInt(percentage) > 0 || parseInt(percentage) < 100))
-      setPixelPercentage(percentage);
+    if (
+      percentage &&
+      (parseInt(percentage) > 0 || parseInt(percentage) <= 100)
+    ) 
+    setPixelPercentage(percentage);
   }
 
   async function handleImageUpload(): Promise<void> {
-    if (!image || !pixelPercentage) return;
+    setErrors([]);
+    // set errors from these scenarios:
+    // 1. both inputs are empty
+    // 2. one of the inputs is empty
+    // 3. image is not empty, but percentage is wrong
+    if (image === null || !pixelPercentage) {
+      if (image === null) {
+        const imageError: ErrorMessage = {
+          id: 1, message: "A jpg file must be uploaded" 
+        }
+        errors.push(imageError);
+      }
+      if (!pixelPercentage) {
+        setErrors([...errors, { id: 2, message: "A number must be typed" }]);
+      }
+
+      if ((pixelPercentage && (parseInt(pixelPercentage) <= 0 || parseInt(pixelPercentage) > 100))) {
+        setErrors([
+          ...errors,
+          { id: 3, message: "Percentage must be a number between 1 and 100" },
+        ]);
+      }
+
+      setStatus("error");
+      console.log(status);
+
+      return;
+    }
 
     setStatus("uploading");
 
@@ -49,6 +84,7 @@ export default function ImageUploader() {
     } catch {
       setStatus("error");
     }
+    console.log(status);
   }
 
   return (
@@ -59,15 +95,20 @@ export default function ImageUploader() {
             <p className="text-5xl font-bold">Image Pixelator</p>
           </div>
           <div className="inputContainer grid grid-rows-2 bg-gray-300 rounded-xl mb-5">
-            <section className="chooseFileContainer rounded-lg">
+            <section>
               <input
                 id="fileInput"
                 type="file"
                 onChange={handleImageChange}
                 accept="image/png, image/jpg, image/jpeg"
               />
+              {image === null && errors.some((error) => error.id === 1) && (
+                <p>
+                  {errors.find((error) => error.id == 1)?.message}
+                </p>
+              )}
             </section>
-            <section className="percentContainer">
+            <section>
               <label htmlFor="number" className="pr-3">
                 {" "}
                 What Percentage?{" "}
@@ -78,6 +119,16 @@ export default function ImageUploader() {
                 placeholder="1 - 100"
                 onChange={handlePixelationPercent}
               />
+              {!pixelPercentage && errors.some((error) => error.id === 2) && (
+                <p className="text-red-500">
+                  {errors.find((error) => error.id == 2)?.message}
+                </p>
+              )}
+              {pixelPercentage && errors.some((error) => error.id === 3) && (
+                <p className="text-red-500">
+                  {errors.find((error) => error.id == 3)?.message}
+                </p>
+              )}
             </section>
           </div>
           <button className="pixelateButton" onClick={handleImageUpload}>
@@ -94,7 +145,9 @@ export default function ImageUploader() {
                 alt="newImage"
               />
               <section>
-                <p className="text-center text-2xl font-bold m-6">Pixelation done!</p>
+                <p className="text-center text-2xl font-bold m-6">
+                  Pixelation done!
+                </p>
               </section>
               <section className="ml-36 flex flex-row">
                 <button>Try Again</button>
@@ -104,7 +157,6 @@ export default function ImageUploader() {
               </section>
             </div>
           )}
-          {status === "error" && <p>Image upload failed...</p>}
         </div>
       </div>
     </div>

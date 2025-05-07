@@ -5,34 +5,27 @@ button {
 }
 
 .inputContainer > section {
-  @apply p-3;
+  @apply p-4 ml-3;
 }
 
-.percentContainer {
-  @apply ml-4;
+.inputContainer > section > p{
+  @apply text-red-500 font-semibold;
 }
 
 .pixelateButton {
   @apply float-right hover:bg-pink-500;
 }
 
-input[type="file"] {
-  @apply ml-3 mt-2;
-}
 input[type="file"]::file-selector-button {
   @apply bg-blue-400 rounded-md w-28 h-8;
 }
 
 input[type="file"]::selection{
-  @apply ml-12;
+  padding-left: 20px;
 }
 
 input[type="number"] {
-  @apply border-1 bg-white rounded-sm;
-}
- 
-input[type="number"]::placeholder {
-  @apply pl-2;
+  @apply border-1 bg-white rounded-sm pl-1;
 }
 
 .newImageRender > section > button {
