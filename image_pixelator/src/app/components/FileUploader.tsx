@@ -27,35 +27,35 @@ export default function ImageUploader() {
     const percentage = e.target.value;
     if (
       percentage &&
-      (parseInt(percentage) > 0 || parseInt(percentage) <= 100)
-    ) 
-    setPixelPercentage(percentage);
+      (parseInt(percentage) <= 0 || parseInt(percentage) > 100)){
+        const percentageError = {
+          id: 3, message: "Percentage must be a number between 1 and 100"};
+        setErrors([
+          ...errors, percentageError
+        ]);
+      } else {
+        if (errors.some((error) => error.id === 3)) {
+          errors.splice(errors.findIndex((errors) => errors.id == 3), 1);
+        }
+        setPixelPercentage(percentage);
+      }
   }
 
   async function handleImageUpload(): Promise<void> {
-    setErrors([]);
-    // set errors from these scenarios:
-    // 1. both inputs are empty
-    // 2. one of the inputs is empty
-    // 3. image is not empty, but percentage is wrong
     if (image === null || !pixelPercentage) {
       if (image === null) {
+        console.log('1th if')
         const imageError: ErrorMessage = {
           id: 1, message: "A jpg file must be uploaded" 
         }
         errors.push(imageError);
       }
       if (!pixelPercentage) {
+        console.log('2th if')
         setErrors([...errors, { id: 2, message: "A number must be typed" }]);
       }
 
-      if ((pixelPercentage && (parseInt(pixelPercentage) <= 0 || parseInt(pixelPercentage) > 100))) {
-        setErrors([
-          ...errors,
-          { id: 3, message: "Percentage must be a number between 1 and 100" },
-        ]);
-      }
-
+      console.log(pixelPercentage);
       setStatus("error");
       console.log(status);
 
@@ -131,9 +131,12 @@ export default function ImageUploader() {
               )}
             </section>
           </div>
-          <button className="pixelateButton" onClick={handleImageUpload}>
+          {image instanceof File && pixelPercentage && !errors.some((errors) => errors.id == 3) &&
+          (
+            <button className="pixelateButton" onClick={handleImageUpload}>
             Pixelate
           </button>
+          )}
         </div>
         <div className="rightSide w-1/2 bg-gray-200 relative">
           {pixelated && (
